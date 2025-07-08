@@ -77,8 +77,8 @@ public class Player {
                     money = money - bet;
                     bet = bet * 2;
                     Karten last = karteziehen(stapel.kartenstapel);
-                    System.out.println(name + " drew: " + temp.name + " of " + temp.suit);
-                    System.out.println(name + "'s score now is: " + scoreUpdate(temp.kartenwert));
+                    System.out.println(name + " drew: " + last.name + " of " + last.suit);
+                    System.out.println(name + "'s score now is: " + scoreUpdate(last.kartenwert));
                     System.out.println("-------");
                 }
             } else {
