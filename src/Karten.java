@@ -1,5 +1,5 @@
 public class Karten {
-    public int kartenwert;
+    public double kartenwert;
     public String suit;
     public String name;
 

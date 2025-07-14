@@ -107,8 +107,4 @@ public class Kartenstapel {
         Karten aceofclubs = new Karten(11, "Clubs", "ace");
         kartenstapel[51] = aceofclubs;
     }
-
-    public Karten[] getStapel() {
-        return kartenstapel;
-    }
 }

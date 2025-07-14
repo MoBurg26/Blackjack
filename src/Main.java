@@ -22,54 +22,33 @@ public class Main {
             players[i].bet();
         }
         dealer.zug1();
-        System.out.println("-------------------------------------------------------------");
         for (int i = 0; i < n; i++) {
-            players[i].zug();
-        }
-        int allBusted = 0;
-        for (int i = 0; i < n; i++) {
-            if (players[i].busted) {
-                allBusted = allBusted + 1;
+            players[i].initialzug();
+            if (players[i].split) {
+                Playerhands splithand1 = new Playerhands(players[i].score / 2, players[i].name + "'s first splithand", players[i].stapel, players[i].ace, players[i].bet, 0);
+                players[i].hands[0] = splithand1;
+                Playerhands splithand2 = new Playerhands(players[i].score / 2, players[i].name + "'s second splithand", splithand1.stapel, players[i].ace, players[i].bet, 0);
+                players[i].hands[1] = splithand2;
+                splithand1.zug1();
+                splithand1.zug();
+                splithand2.zug1();
+                splithand2.zug();
+            } else if (!players[i].doubled) {
+                players[i].zug();
             }
         }
-        if (allBusted < n) {
+        if (!allBusted(players, n)) {
             System.out.println("dealer has: " + dealer.score);
             dealer.zug2();
             if (!dealer.busted || !dealer.blackjack) {
                 dealer.zug();
-                if (!dealer.busted) {
-                    for (int i = 0; i < n; i++) {
-                        if (!players[i].busted) {
-                            if (dealer.score == players[i].score) {
-                                if (!players[i].blackjack && !dealer.blackjack || players[i].blackjack && dealer.blackjack) {
-                                    System.out.println("it's a push");
-                                    players[i].money = players[i].money + players[i].bet;
-                                } else if (players[i].blackjack && !dealer.blackjack) {
-                                    System.out.println(players[i].name + " wins");
-                                    players[i].money = players[i].money + players[i].bet * 2 + players[i].bet * 0.5;
-                                } else {
-                                    System.out.println("dealer wins");
-                                }
-                            } else if (dealer.score > players[i].score) {
-                                System.out.println("dealer wins");
-                            } else {
-                                System.out.println(players[i].name + " wins");
-                                players[i].money = players[i].money + players[i].bet * 2;
-                                if (players[i].blackjack) {
-                                    players[i].money = players[i].money + players[i].bet * 0.5;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    for (int i = 0; i < n; i++) {
-                        if (!players[i].busted) {
-                            System.out.println(players[i].name + " wins");
-                            players[i].money = players[i].money + players[i].bet * 2;
-                            if (players[i].blackjack) {
-                                players[i].money = players[i].money + players[i].bet * 0.5;
-                            }
-                        }
+                for (int i = 0; i < n; i++) {
+                    if (!players[i].split) {
+                        scoreCheck(players[i], dealer);
+                    } else {
+                        scoreCheck(players[i].hands[0], dealer);
+                        scoreCheck(players[i].hands[1], dealer);
+                        players[i].money = players[i].money + players[i].hands[1].money + players[i].hands[0].money;
                     }
                 }
             }
@@ -84,6 +63,7 @@ public class Main {
             for (int i = 0; i < n; i++) {
                 Player temp = players[i];
                 players[i] = new Player(stapel, temp.name, temp.money);
+                dealer = new Dealer(stapel);
             }
             edit(players, n, scan, stapel);
             for (int i = 0; i < n; i++) {
@@ -92,7 +72,6 @@ public class Main {
                     players[i].money = 1;
                 }
             }
-            System.out.println("-------------------------------------------------------------");
             game(n, players, dealer);
         }
     }
@@ -159,6 +138,54 @@ public class Main {
                 addPlayer(players, n, scan, stapel);
             }
             edit(players, n, scan, stapel);
+        }
+    }
+
+    public static boolean allBusted(Player[] players, int n) {
+        int b = 0;
+        for (int i = 0; i < n; i++) {
+            if (players[i].busted) {
+                b = b + 1;
+            }
+            if (b == n) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void scoreCheck(Player player, Dealer dealer) {
+        if (!dealer.busted) {
+            if (!player.busted) {
+                if (dealer.score == player.score) {
+                    if (!player.blackjack && !dealer.blackjack || player.blackjack && dealer.blackjack) {
+                        System.out.println("it's a push");
+                        player.money = player.money + player.bet;
+                    } else if (player.blackjack && !dealer.blackjack) {
+                        System.out.println(player.name + " wins");
+                        player.money = player.money + player.bet * 2 + player.bet * 0.5;
+                    } else {
+                        System.out.println("dealer wins");
+                    }
+                } else if (dealer.score > player.score) {
+                    System.out.println("dealer wins");
+                } else {
+                    System.out.println(player.name + " wins");
+                    player.money = player.money + player.bet * 2;
+                    if (player.blackjack) {
+                        player.money = player.money + player.bet * 0.5;
+                    }
+                }
+            }
+        } else {
+            if (!player.busted) {
+                System.out.println(player.name + " wins");
+                player.money = player.money + player.bet * 2;
+                if (player.blackjack) {
+                    player.money = player.money + player.bet * 0.5;
+                }
+
+            }
         }
     }
 }

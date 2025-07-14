@@ -3,19 +3,23 @@ import java.util.Scanner;
 
 public class Player {
     String name;
-    int score = 0;
+    double score = 0;
     boolean ace = false;
     Scanner scan = new Scanner(System.in);
     boolean busted = false;
     Kartenstapel stapel;
     double money = 100;
     boolean blackjack = false;
-    int bet = 0;
+    double bet = 0;
+    boolean split = false;
+    boolean doubled = false;
+    Playerhands[] hands = new Playerhands[2];
 
     public Player(Kartenstapel stapel, String name) {
         this.stapel = stapel;
         this.name = name;
     }
+
     public Player(Kartenstapel stapel, String name, double money) {
         this.stapel = stapel;
         this.name = name;
@@ -26,7 +30,7 @@ public class Player {
     }
 
 
-    public int scoreUpdate(int temp) {
+    public double scoreUpdate(double temp) {
         if (temp == 11) {
             ace = true;
         }
@@ -43,11 +47,10 @@ public class Player {
         }
     }
 
-    public void zug() {
+    public void initialzug() {
         Karten temp = karteziehen(stapel.kartenstapel);
         System.out.println(name + " drew: " + temp.name + " of " + temp.suit);
         System.out.println(name + "'s score now is: " + scoreUpdate(temp.kartenwert));
-        System.out.println("-------");
         if (score == temp.kartenwert) {
             temp = karteziehen(stapel.kartenstapel);
             System.out.println(name + " drew: " + temp.name + " of " + temp.suit);
@@ -55,40 +58,36 @@ public class Player {
             if (score == 21) {
                 System.out.println("blackjack");
                 blackjack = true;
-            } /*else if (score / 2 == temp.kartenwert) {
-                System.out.println("do you want to split y/n");
-                if (scan.nextLine().equals("y")) {
-                    Splitplayer splitplayer1 = new Splitplayer(score / 2);
-                    Splitplayer splitplayer2 = new Splitplayer(score / 2);
+            } else if (bet <= money) {
+                if (score / 2 == temp.kartenwert) {
+                    System.out.println(name + " do you want to split y/n");
+                    if (scan.next().equals("y")) {
+                        money = money - bet;
+                        split = true;
+                    }
+                } else {
+                    System.out.println(name + " do you want to double y/n");
+                    if (scan.next().equals("y")) {
+                        money = money - bet;
+                        bet = bet * 2;
+                        Karten last = karteziehen(stapel.kartenstapel);
+                        System.out.println(name + " drew: " + last.name + " of " + last.suit);
+                        System.out.println(name + "'s score now is: " + scoreUpdate(last.kartenwert));
+                        doubled = true;
+                    }
                 }
-            }*/ else {
-                System.out.println("-------\n" + name + "'s turn:");
             }
         }
+    }
+
+    public void zug() {
         if (score < 21) {
-            if (bet <= money) {
-                System.out.println("do you want to hit (h), stay (s) or double (d)?");
-                String cont = scan.next();
-                if (cont.equals("h")) {
-                    zug();
-                } else if (cont.equals("s")) {
-                    System.out.println("-------");
-                } else if (cont.equals("d")) {
-                    money = money - bet;
-                    bet = bet * 2;
-                    Karten last = karteziehen(stapel.kartenstapel);
-                    System.out.println(name + " drew: " + last.name + " of " + last.suit);
-                    System.out.println(name + "'s score now is: " + scoreUpdate(last.kartenwert));
-                    System.out.println("-------");
-                }
-            } else {
-                System.out.println("do you want to hit (h) or stay (s)?");
-                String cont = scan.next();
-                if (cont.equals("h")) {
-                    zug();
-                } else if (cont.equals("s")) {
-                    System.out.println("-------");
-                }
+            System.out.println(name + " do you want to hit (h) or stay (s)?");
+            if (scan.next().equals("h")) {
+                Karten temp = karteziehen(stapel.kartenstapel);
+                System.out.println(name + " drew: " + temp.name + " of " + temp.suit);
+                System.out.println(name + "'s score now is: " + scoreUpdate(temp.kartenwert));
+                zug();
             }
         }
     }
@@ -104,7 +103,7 @@ public class Player {
         return karteziehen(kartenstapel);
     }
 
-    public int bet() {
+    public double bet() {
         System.out.println(name + " please enter you're bet");
         bet = scan.nextInt();
         if (0 < bet && bet <= money) {

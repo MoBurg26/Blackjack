@@ -4,34 +4,30 @@ public class Dealer extends Player {
         this.stapel = stapel;
     }
 
-    public int scoreUpdate(int temp) {
-        if (score + temp > 21 && !ace) {
-            System.out.println("dealer busted");
-            busted = true;
-            return score = score + temp;
-        } else {
-            if (ace && (score + temp) > 21) {
-                score = score - 10;
-                ace = false;
-            }
-            return score = score + temp;
+    public double scoreUpdate(double temp) {
+        if (temp==11){
+            ace = true;
         }
+        if ((score + temp) > 21) {
+            if (!ace) {
+                busted = true;
+                return score = score + temp;
+            } else {
+                System.out.println("dealer busted");
+                return score = score + temp - 10;
+            }
+        }
+        return score = score + temp;
     }
 
     public void zug1() {
         Karten temp = karteziehen(stapel.kartenstapel);
-        if (temp.kartenwert == 11) {
-            ace = true;
-        }
         System.out.println("dealer drew: " + temp.name + " of " + temp.suit);
         System.out.println("dealer's score now is: " + scoreUpdate(temp.kartenwert));
     }
 
     public void zug2() {
         Karten temp = karteziehen(stapel.kartenstapel);
-        if (temp.kartenwert == 11) {
-            ace = true;
-        }
         System.out.println("dealer drew: " + temp.name + " of " + temp.suit);
         System.out.println("dealer's score now is: " + scoreUpdate(temp.kartenwert));
         if (score == 21) {
@@ -43,12 +39,8 @@ public class Dealer extends Player {
     public void zug() {
         if (score < 17) {
             Karten temp = karteziehen(stapel.kartenstapel);
-            if (temp.kartenwert == 11) {
-                ace = true;
-            }
             System.out.println("dealer drew: " + temp.name + " of " + temp.suit);
             System.out.println("dealer's score now is: " + scoreUpdate(temp.kartenwert));
-            System.out.println("-------");
             zug();
         }
     }
